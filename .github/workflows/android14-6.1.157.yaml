@@ -1,0 +1,60 @@
+# Paste your YAML content here
+name: Build LKM for KernelSU Local
+on:
+  workflow_call:
+    inputs:
+      upload:
+        required: true
+        type: boolean
+        default: true
+        description: "Whether to upload to branch"
+    secrets:
+      TOKEN:
+        required: true
+  workflow_dispatch:
+    inputs:
+      upload:
+        required: true
+        type: boolean
+        default: true
+        description: "Whether to upload to branch"
+
+jobs:
+  build-lkm:
+    runs-on: self-hosted
+    steps:
+      - name: Build android14-6.1
+        uses: ./.github/workflows/gki-kernel-local.yml
+        with:
+          version: "android14-6.1"
+          version_name: "android14-6.1.157"
+          tag: "android14-6.1-2026-07"
+          os_patch_level: "2026-07"
+          build_lkm: true
+
+  push-to-branch:
+    needs: build-lkm
+    runs-on: self-hosted
+    if: ${{ inputs.upload }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: bin/
+          merge-multiple: true
+
+      - name: Push to branch LKM
+        run: |
+          cd bin
+          git config --global init.defaultBranch lkm
+          git init
+          git remote add origin https://github-actions[bot]:${{ secrets.TOKEN }}@github.com/${{ github.repository }}
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          find . -type f
+          git add .
+          git commit -m "Upload LKM from ${{ github.sha }}" -m "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          git push --force --set-upstream origin lkm
