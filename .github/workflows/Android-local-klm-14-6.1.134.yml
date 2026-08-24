@@ -46,7 +46,7 @@ jobs:
 ┆┆┆┆┆          merge-multiple: true
 
 ┆┆┆      - name: Configure Git
-┆┆┆┆        run: |
+┆┆┆┆  run: |
 ┆┆┆┆┆          git config --global user.email "bot@kernelsu.org"
 ┆┆┆┆┆          git config --global user.name "KernelSUBot"
 ┆┆┆┆┆          git config --global init.defaultBranch lkm
