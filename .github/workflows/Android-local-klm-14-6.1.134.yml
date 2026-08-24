@@ -1,78 +1,78 @@
 name: Build LKM for KernelSU Local
 on:
-┆  workflow_call:
-┆┆    inputs:
-┆┆┆      upload:
-┆┆┆┆        required: true
-┆┆┆┆        type: boolean
-┆┆┆┆        default: true
-┆┆┆┆        description: "Whether to upload to branch"
-┆┆    secrets:
-┆┆┆      TOKEN:
-┆┆┆┆        required: true
-┆  workflow_dispatch:
-┆┆    inputs:
-┆┆┆      upload:
-┆┆┆┆        required: true
-┆┆┆┆        type: boolean
-┆┆┆┆        default: true
-┆┆┆┆        description: "Whether to upload to branch"
+  workflow_call:
+    inputs:
+      upload:
+        required: true
+        type: boolean
+        default: true
+        description: "Whether to upload to branch"
+    secrets:
+      TOKEN:
+        required: true
+  workflow_dispatch:
+    inputs:
+      upload:
+        required: true
+        type: boolean
+        default: true
+        description: "Whether to upload to branch"
 
 jobs:
-┆  build-lkm:
-┆┆    strategy:
-┆┆┆      matrix:
-┆┆┆┆        include:
-┆┆┆┆┆          - version: "android14-6.1"
-┆┆┆┆┆┆            sub_level: 134
-┆┆┆┆┆┆            os_patch_level: 2025-05
-┆┆    uses: ./.github/workflows/gki-kernel-local.yml
-┆┆    with:
-┆┆┆      version: ${{ matrix.version }}
-┆┆┆      version_name: ${{ matrix.version }}.${{ matrix.sub_level }}
-┆┆┆      tag: ${{ matrix.version }}-${{ matrix.os_patch_level }}
-┆┆┆      os_patch_level: ${{ matrix.os_patch_level }}
-┆┆┆      build_lkm: true
+  build-lkm:
+    strategy:
+      matrix:
+        include:
+          - version: "android14-6.1"
+            sub_level: 134
+            os_patch_level: 2025-05
+    uses: ./.github/workflows/gki-kernel-local.yml
+    with:
+      version: ${{ matrix.version }}
+      version_name: ${{ matrix.version }}.${{ matrix.sub_level }}
+      tag: ${{ matrix.version }}-${{ matrix.os_patch_level }}
+      os_patch_level: ${{ matrix.os_patch_level }}
+      build_lkm: true
 
-┆  push-to-branch:
-┆┆    needs: [build-lkm]
-┆┆    runs-on: self-hosted
-┆┆    if: ${{ inputs.upload }}
-┆┆    steps:
-┆┆┆      - name: Download all workflow run artifacts
-┆┆┆┆        uses: actions/download-artifact@v4
-┆┆┆┆        with:
-┆┆┆┆┆          path: bin/
-┆┆┆┆┆          merge-multiple: true
+  push-to-branch:
+    needs: [build-lkm]
+    runs-on: self-hosted
+    if: ${{ inputs.upload }}
+    steps:
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: bin/
+          merge-multiple: true
 
-┆┆┆      - name: Configure Git
-┆┆┆┆  run: |
-┆┆┆┆┆          git config --global user.email "bot@kernelsu.org"
-┆┆┆┆┆          git config --global user.name "KernelSUBot"
-┆┆┆┆┆          git config --global init.defaultBranch lkm
+      - name: Configure Git
+        run: |
+          git config --global user.email "bot@kernelsu.org"
+          git config --global user.name "KernelSUBot"
+          git config --global init.defaultBranch lkm
 
-┆┆┆      - name: Initialize Git Repository
-┆┆┆┆        run: |
-┆┆┆┆┆          cd bin
-┆┆┆┆┆          git init
+      - name: Initialize Git Repository
+        run: |
+          cd bin
+          git init
 
-┆┆┆      - name: Add LKM artifacts
-┆┆┆┆        run: |
-┆┆┆┆┆          cd bin
-┆┆┆┆┆          git add *.ko || true
-┆┆┆┆┆          git commit -m "Add KernelSU LKM artifacts" || echo "Nothing to commit"
+      - name: Add LKM artifacts
+        run: |
+          cd bin
+          git add *.ko || true
+          git commit -m "Add KernelSU LKM artifacts" || echo "Nothing to commit"
 
-┆┆┆      - name: Push to LKM branch
-┆┆┆┆        env:
-┆┆┆┆┆          TOKEN: ${{ secrets.TOKEN }}
-┆┆┆┆        run: |
-┆┆┆┆┆          cd bin
-┆┆┆┆┆          git remote add origin https://${{ github.actor }}:${TOKEN}@github.com/${{ github.repository }}.git
-┆┆┆┆┆          git push -u origin lkm --force || echo "Push failed, continuing..."
+      - name: Push to LKM branch
+        env:
+          TOKEN: ${{ secrets.TOKEN }}
+        run: |
+          cd bin
+          git remote add origin https://${{ github.actor }}:${TOKEN}@github.com/${{ github.repository }}.git
+          git push -u origin lkm --force || echo "Push failed, continuing..."
 
-┆┆┆      - name: Verify artifacts
-┆┆┆┆        run: |
-┆┆┆┆┆          cd bin
-┆┆┆┆┆          echo "Generated artifacts:"
-┆┆┆┆┆          ls -lh *.ko 2>/dev/null || echo "No .ko files found"
-┆┆┆┆┆          find . -name "*kernelsu*" -type f 2>/dev/null || echo "No kernelsu files found"
+      - name: Verify artifacts
+        run: |
+          cd bin
+          echo "Generated artifacts:"
+          ls -lh *.ko 2>/dev/null || echo "No .ko files found"
+          find . -name "*kernelsu*" -type f 2>/dev/null || echo "No kernelsu files found"
