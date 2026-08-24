@@ -33,8 +33,7 @@ jobs:
 ┆┆┆      tag: ${{ matrix.version }}-${{ matrix.os_patch_level }}
 ┆┆┆      os_patch_level: ${{ matrix.os_patch_level }}
 ┆┆┆      build_lkm: true
-
-  push-to-branch:
+push-to-branch:
     needs: [build-lkm]
     runs-on: self-hosted
     if: ${{ inputs.upload }}
