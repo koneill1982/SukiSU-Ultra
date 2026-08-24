@@ -46,7 +46,7 @@ jobs:
 ┆┆┆┆┆          merge-multiple: true
 
 ┆┆┆      - name: Push to branch LKM
-┆┆┆┆        run: |
+┆┆┆┆         run: |
 ┆┆┆┆┆          cd bin
 ┆┆┆┆┆          git config --global init.defaultBranch lkm
 ┆┆┆┆┆          git init
