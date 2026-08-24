@@ -8,7 +8,7 @@ on:
 ┆┆┆┆        default: true
 ┆┆┆┆        description: "Whether to upload to branch"
 ┆┆    secrets:
-┆┆┆      # username:github_pat
+┆┆┆      # username:gthub_pat
 ┆┆┆      TOKEN:
 ┆┆┆┆        required: true
 ┆  workflow_dispatch:
