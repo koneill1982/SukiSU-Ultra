@@ -18,6 +18,7 @@ on:
         type: boolean
         default: true
         description: "Whether to upload to branch"
+
 jobs:
   build-lkm:
     strategy:
@@ -25,7 +26,7 @@ jobs:
         include:
           - version: "android14-6.1"
             sub_level: 134
-            os_patch_level: 2025-05    
+            os_patch_level: 2025-05
     # uses: ./.github/workflows/gki-kernel-mock.yml when debugging
     uses: ./.github/workflows/gki-kernel-local.yml
     with:
