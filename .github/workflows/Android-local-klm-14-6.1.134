@@ -1,0 +1,52 @@
+name: Build LKM for KernelSU Local
+on:
+  workflow_call:
+    inputs:
+      upload:
+        required: true
+        type: boolean
+        default: true
+        description: "Whether to upload to branch"
+    secrets:
+      # username:github_pat
+      TOKEN:
+        required: true
+  workflow_dispatch:
+    inputs:
+      upload:
+        required: true
+        type: boolean
+        default: true
+        description: "Whether to upload to branch"
+jobs:
+  build-lkm:
+    strategy:
+      matrix:
+        include:
+          - version: "android14-6.1"
+            sub_level: 134
+            os_patch_level: 2025-05    
+    # uses: ./.github/workflows/gki-kernel-mock.yml when debugging
+    uses: ./.github/workflows/gki-kernel-local.yml
+    with:
+      version: ${{ matrix.version }}
+      version_name: ${{ matrix.version }}.${{ matrix.sub_level }}
+      tag: ${{ matrix.version }}-${{ matrix.os_patch_level }}
+      os_patch_level: ${{ matrix.os_patch_level }}
+      build_lkm: true
+
+  push-to-branch:
+    needs: [build-lkm]
+    runs-on: self-hosted
+    if: ${{ inputs.upload }}
+    steps:
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: bin/
+          merge-multiple: true
+      - name: Push to branch LKM
+        run: |
+          cd bin
+          git config --global init.defaultBranch lkm
+          git init
