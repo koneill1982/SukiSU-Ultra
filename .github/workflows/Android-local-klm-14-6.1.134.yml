@@ -76,3 +76,11 @@ jobs:
           echo "Generated artifacts:"
           ls -lh *.ko 2>/dev/null || echo "No .ko files found"
           find . -name "*kernelsu*" -type f 2>/dev/null || echo "No kernelsu files found"
+secrets:
+  BOOT_SIGN_KEY: ${{ secrets.BOOT_SIGN_KEY || '' }}
+  CHAT_ID: ${{ secrets.CHAT_ID || '' }}
+  BOT_TOKEN: ${{ secrets.BOT_TOKEN || '' }}
+  MESSAGE_THREAD_ID: ${{ secrets.MESSAGE_THREAD_ID || '' }}- name: Checkout repository
+  uses: actions/checkout@v4
+  with:
+    fetch-depth: 0
