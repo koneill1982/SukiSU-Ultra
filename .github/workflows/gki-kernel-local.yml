@@ -95,11 +95,11 @@ jobs:
           export REPO_URL='https://mirrors.tuna.tsinghua.edu.cn/git/git-repo'
           mkdir android-kernel && cd android-kernel
           repo init --depth=1 --u https://mirrors.tuna.tsinghua.edu.cn/git/AOSP/kernel/manifest -b common-${{ inputs.tag }} --repo-rev=v2.35
-          REMOTE_BRANCH=$(git ls-remote https://mirrors.tuna.tsinghua.edu.cn/git/AOSP/kernel/common ${{ inputs.tag }})
+          REMOTE_BRANCH=$(git ls-remote https://mirrors.tuna.tsinghua.edu.cn/git/AOSP/kernel/common common-${{ inputs.tag }})
           DEFAULT_MANIFEST_PATH=.repo/manifests/default.xml
           if grep -q deprecated <<< $REMOTE_BRANCH; then
             echo "Found deprecated branch: ${{ inputs.tag }}"
-            sed -i 's/"${{ inputs.tag }}"/"deprecated\/${{ inputs.tag }}"/g' $DEFAULT_MANIFEST_PATH
+            sed -i 's/"common-${{ inputs.tag }}"/"deprecated\/common-${{ inputs.tag }}"/g' $DEFAULT_MANIFEST_PATH
             cat $DEFAULT_MANIFEST_PATH
           fi
           repo --version
@@ -128,7 +128,7 @@ jobs:
             echo "GLIBC_VERSION: $GLIBC_VERSION"
             if [ "$(printf '%s\n' "2.38" "$GLIBC_VERSION" | sort -V | head -n1)" = "2.38" ]; then
               echo "Patching resolve_btfids/Makefile"
-              cd $GKI_ROOT/common/ && sed -i '/\$(Q)\$(MAKE) -C \$(SUBCMD_SRC) OUTPUT=\$(abspath \$(dir \$@))\/ \$(abspath \$@)/s//$(Q)$(MAKE) -C $(SUBCMD_SRC) EXTRA_CFLAGS="$(CFLAGS)" OUTPUT=$(a[...]
+              cd $GKI_ROOT/common/ && sed -i '/\$(Q)\$(MAKE) -C \$(SUBCMD_SRC) OUTPUT=\$(abspath \$(dir \$@))\/ \$(abspath \$@)/s//$(Q)$(MAKE) -C $(SUBCMD_SRC) EXTRA_CFLAGS="$(CFLAGS)" OUTPUT=$(abspath $(dir $@))/ $(abspath $@)/g' tools/bpf/resolve_btfids/Makefile
             fi
           fi
 
