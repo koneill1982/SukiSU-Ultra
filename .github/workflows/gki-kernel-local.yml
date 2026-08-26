@@ -128,7 +128,7 @@ jobs:
             echo "GLIBC_VERSION: $GLIBC_VERSION"
             if [ "$(printf '%s\n' "2.38" "$GLIBC_VERSION" | sort -V | head -n1)" = "2.38" ]; then
               echo "Patching resolve_btfids/Makefile"
-              cd $GKI_ROOT/common/ && sed -i '$(Q)$(MAKE) -C $(SUBCMD_SRC) OUTPUT=$(abspath $(dir $@))/ $(abspath $@)/{s|OUTPUT=\$(abspath \$(dir \$$@))\/ \$(abspath \$$@)|OUTPUT=$(abspath $(dir $@))/ $(abspath $@)|g;}' tools/bpf/resolve_btfids/Makefile || echo "No patch needed."
+              cd $GKI_ROOT/common/ && sed -i '/\$(Q)\$(MAKE) -C \$(SUBCMD_SRC) OUTPUT=\$(abspath \$(dir \$@))\/ \$(abspath \$@)/s|OUTPUT=\$(abspath \$(dir \$@))\/ \$(abspath \$@)|OUTPUT=$(abspath $(dir $@))/ $(abspath $@)|g' tools/bpf/resolve_btfids/Makefile || echo "No patch needed."
             fi
           fi
 
