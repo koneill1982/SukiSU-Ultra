@@ -20,16 +20,13 @@ on:
 
 jobs:
   build-lkm:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Build android14-6.1
-        uses: ./.github/workflows/gki-kernel-local.yml@main
-        with:
-          version: "android14-6.1"
-          version_name: "android14-6.1.157"
-          tag: "android14-6.1-2026-07"
-          os_patch_level: "2026-07"
-          build_lkm: true
+    uses: ./.github/workflows/gki-kernel-local.yml
+    with:
+      version: "android14-6.1"
+      version_name: "android14-6.1.157"
+      tag: "android14-6.1-2026-07"
+      os_patch_level: "2026-07"
+      build_lkm: true
 
   push-to-branch:
     needs: build-lkm
