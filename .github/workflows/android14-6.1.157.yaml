@@ -24,7 +24,7 @@ jobs:
     with:
       version: "android14-6.1"
       version_name: "android14-6.1.157"
-      tag: "android14-6.1-2026-07"
+      tag: "android14-6.1"
       os_patch_level: "2026-07"
       build_lkm: true
 
